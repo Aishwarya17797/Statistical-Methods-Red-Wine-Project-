@@ -4,7 +4,7 @@ This project investigates the factors influencing the quality of red wine using 
 
 **Analysis Techniques:**
 
-**Descriptive Analysis**: Summarizes the key characteristics of the wine quality data, such as central tendency, spread, and distribution.
+**Descriptive Analysis**: Summarizes the key characteristics of the wine quality data, such as central tendency, spread, and distribution.                                    
 **Hypothesis Testing**: Formulates and tests hypotheses about the relationships between wine attributes and quality.
 **Central Limit Theorem (CLT)**: Provides foundation for statistical inferences based on sample data.
 **Maximum Likelihood Estimation (MLE)**: Estimates model parameters that maximize the likelihood of observing the data.
