@@ -1,0 +1,735 @@
+---
+title: "Wine Project - Part A"
+author: "Aishwarya Jawalkar"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(here)
+```
+
+
+### Red Wine Dataset
+
+This report summarizes our findings, offering insights into the chemical composition and sensory evaluations of red wines to unveil factors contributing to wine quality bringing together the art of wine tasting and data analysis.
+
+```{r}
+#Importing the necessary libraries
+library(tidyverse)
+library(here)
+
+```
+
+***Importing Dataset***
+
+```{r include=TRUE}
+
+#Reading the data set
+file_path_red <- here("Data", "winequality-red.csv")
+red_wine_data <- read.table(file_path_red, sep = ";", header = TRUE, stringsAsFactors = FALSE)
+view(red_wine_data)
+attach(red_wine_data)
+
+```
+
+***Snapshot of the Dataset***
+
+The dataset had seperation value as ';' instead of ',' as in any regular csv file. So, while reading the file we specified the seperation value of ';' to read variables in seperate columns.
+
+![](C:\Users\jawal\OneDrive\Desktop\Stat Methods\dataset_snap.png)
+
+**Question 5a. What is the sample size?**
+
+```{r include=TRUE}
+
+red_wine_sample_size <- nrow(red_wine_data)
+print(paste("The sample size for red wine data set is: ", red_wine_sample_size))
+
+```
+
+1. ***Fixed Acidity***
+
+**Question 5b. Any outliers? Do you have any concerns about the data quality?**
+
+First, we will get the summary of the column fixed.acidity.
+
+```{r include=TRUE}
+
+summary(fixed.acidity)
+
+```
+
+Looking at the summary it is observed that the range between 3rd quartile and max is notably greater, which indicates that 75% of the data is till 9.20 and rest 25% is till 15.90 - there is a lot of variation in the data which indicates that there might be outliers in the data.
+
+```{r include=TRUE}
+
+sum(is.na(fixed.acidity))
+
+```
+
+**Concerning the data quality issues** - There are no missing values in the column and the statistics shows that the mean and median are pretty close to each other which indicates that the skewness is minimum. Hence the data doesn't seem to have any concerning quality issues.
+
+**Question 5c. How can you summarize the data of each variable in a concise way? What statistics are you going to present?**
+
+```{r include=TRUE}
+
+var(fixed.acidity)
+sd(fixed.acidity)
+
+```
+
+The summary function is able to summarize the data in a concise way. It gives us the Min., 1st Qu., Median, Mean, 3rd Qu. and Max values. Apart from these, we can calculate variance, standard deviation of the data.
+
+```{r include=TRUE}
+
+mean(fixed.acidity)-2*sd(fixed.acidity)
+mean(fixed.acidity)+2*sd(fixed.acidity)
+sum((fixed.acidity>4.83 & fixed.acidity<11.80)==TRUE)/1599
+
+```
+
+The above formula tells us that range of the data is 94.80% ~ 95%.
+
+**Question 5d. How can you visualize the distribution of each variable?**
+
+We can visualize the distribution using histogram and boxplot.
+
+```{r include=TRUE}
+
+par(mfrow = c(1, 2))
+boxplot(fixed.acidity, main = "BoxPlot", col="lightgreen")
+hist(fixed.acidity, freq = FALSE, main = "Histogram", col="lightgreen")
+lines(density(fixed.acidity), lwd=2, col='red')
+
+```
+
+**Question 5e. Do you see any skewed distributions?**
+
+Yes, it is slightly right skewed data.
+
+  
+  
+2. ***Volatile Acidity***
+
+**Question 5b. Any outliers? Do you have any concerns about the data quality?**
+
+First, we will get the summary of the column volatile.acidity.
+
+```{r include=TRUE}
+
+summary(volatile.acidity)
+
+```
+
+Looking at the summary it is observed that the range between 3rd quartile and max is notably greater, which indicates that 75% of the data is till 0.64 and rest 25% is till 1.58 - there is a lot of variation in the data which indicates that there might be outliers in the data.
+
+```{r include=TRUE}
+
+sum(is.na(volatile.acidity))
+
+```
+
+**Concerning the data quality issues** - There are no missing values in the column and the statistics shows that the mean and median are almost same which indicates that the skewness is minimum. Hence the data doesn't seem to have any concerning quality issues.
+
+**Question 5c. How can you summarize the data of each variable in a concise way? What statistics are you going to present?**
+
+```{r include=TRUE}
+
+var(volatile.acidity)
+sd(volatile.acidity)
+
+```
+
+The summary function is able to summarize the data in a concise way. It gives us the Min., 1st Qu., Median, Mean, 3rd Qu. and Max values. Apart from these, we can calculate variance, standard deviation of the data.
+
+```{r include=TRUE}
+
+mean(volatile.acidity)-2*sd(volatile.acidity)
+mean(volatile.acidity)+2*sd(volatile.acidity)
+sum((volatile.acidity>0.16 & volatile.acidity<0.88)==TRUE)/1599
+
+```
+
+The above formula tells us that range of the data is 95.87% ~ 95%.
+
+**Question 5d. How can you visualize the distribution of each variable?**
+
+We can visualize the distribution using histogram and boxplot.
+
+```{r include=TRUE}
+
+par(mfrow = c(1, 2))
+boxplot(volatile.acidity, main = "BoxPlot", col="lightgreen")
+hist(volatile.acidity, freq = FALSE, main = "Histogram", col="lightgreen")
+lines(density(volatile.acidity), lwd=2, col='red')
+
+```
+
+**Question 5e. Do you see any skewed distributions?**
+
+Yes, the distribution is skewed to the right.
+
+3. ***Citric Acid***
+
+**Question 5b. Any outliers? Do you have any concerns about the data quality?**
+
+First, we will get the summary of the column citric.acid
+
+```{r include=TRUE}
+
+summary(citric.acid)
+
+```
+
+Looking at the summary it is observed that the range between 3rd quartile and max is notably greater, which indicates that 75% of the data is till 0.420 and rest 25% is till 1 - which indicates that there might be outliers in the data.
+
+```{r include=TRUE}
+
+sum(is.na(citric.acid))
+
+```
+
+**Concerning the data quality issues** - There are no missing values in the column and the statistics shows that the mean and median are almost same which indicates that the skewness is minimum. Hence the data doesn't seem to have any concerning quality issues.
+
+**Question 5c. How can you summarize the data of each variable in a concise way? What statistics are you going to present?**
+
+```{r include=TRUE}
+
+var(citric.acid)
+sd(citric.acid)
+
+```
+
+The summary function is able to summarize the data in a concise way. It gives us the Min., 1st Qu., Median, Mean, 3rd Qu. and Max values. Apart from these, we can calculate variance, standard deviation of the data.
+
+```{r include=TRUE}
+
+mean(citric.acid)-2*sd(citric.acid)
+mean(citric.acid)+2*sd(citric.acid)
+sum((citric.acid>-0.11 & citric.acid<0.66)==TRUE)/1599
+
+```
+
+The above formula tells us that range of the data is 96.93%.
+
+**Question 5d. How can you visualize the distribution of each variable?**
+
+We can visualize the distribution using histogram and boxplot.
+
+```{r include=TRUE}
+
+par(mfrow = c(1, 2))
+boxplot(citric.acid, main = "BoxPlot", col="lightgreen")
+hist(citric.acid, freq = FALSE, main = "Histogram", col="lightgreen")
+lines(density(citric.acid), lwd=2, col='red')
+
+```
+
+**Question 5e. Do you see any skewed distributions?**
+
+Yes, the distribution is skewed to the right.
+
+4. ***Residual Sugar***
+
+**Question 5b. Any outliers? Do you have any concerns about the data quality?**
+
+First, we will get the summary of the column residual.sugar.
+
+```{r include=TRUE}
+
+summary(residual.sugar)
+
+```
+
+Looking at the summary it is observed that the range between 3rd quartile and max is notably greater, which indicates that 75% of the data is till 2.60 and rest 25% is till 15.50. Also, the range between min and 1st quartile is greater. There is a lot of variation in the data which indicates that there are outliers in the data.
+
+```{r include=TRUE}
+
+sum(is.na(residual.sugar))
+
+```
+
+**Concerning the data quality issues** - There are no missing values in the column and the statistics shows lot of variation in the data - there are outliers in the data, which indicates data quality concerns.
+
+**Question 5c. How can you summarize the data of each variable in a concise way? What statistics are you going to present?**
+
+```{r include=TRUE}
+
+var(residual.sugar)
+sd(residual.sugar)
+
+```
+
+The summary function is able to summarize the data in a concise way. It gives us the Min., 1st Qu., Median, Mean, 3rd Qu. and Max values. Apart from these, we can calculate variance, standard deviation of the data.
+
+```{r include=TRUE}
+
+mean(residual.sugar)-2*sd(residual.sugar)
+mean(residual.sugar)+2*sd(residual.sugar)
+sum((residual.sugar>-0.28 & residual.sugar<5.35)==TRUE)/1599
+
+```
+
+The above formula tells us that range of the data is 95.30% ~ 95%.
+
+**Question 5d. How can you visualize the distribution of each variable?**
+
+We can visualize the distribution using histogram and boxplot.
+
+```{r include=TRUE}
+
+par(mfrow = c(1, 2))
+boxplot(residual.sugar, main = "BoxPlot", col="lightgreen")
+hist(residual.sugar, freq = FALSE, main = "Histogram", col="lightgreen")
+lines(density(residual.sugar), lwd=2, col='red')
+
+```
+
+**Question 5e. Do you see any skewed distributions?**
+
+Yes, the distribution is skewed to the right.
+
+5. ***Chlorides***
+
+**Question 5b. Any outliers? Do you have any concerns about the data quality?**
+
+First, we will get the summary of the column chloride.
+
+```{r include=TRUE}
+
+summary(chlorides)
+
+```
+
+Looking at the summary it is observed that the range between min and 1st quartile and the range between 3rd quartile and max is notably greater, also there is a notable difference between mean and median - there is a lot of variation in the data which indicates that there are outliers in the data.
+
+```{r include=TRUE}
+
+sum(is.na(chlorides))
+
+```
+
+**Concerning the data quality issues** - There are no missing values in the column and the statistics show that there are outliers in the data which indicates data quality concern.
+
+**Question 5c. How can you summarize the data of each variable in a concise way? What statistics are you going to present?**
+
+```{r include=TRUE}
+
+var(chlorides)
+sd(chlorides)
+
+```
+
+The summary function is able to summarize the data in a concise way. It gives us the Min., 1st Qu., Median, Mean, 3rd Qu. and Max values. Apart from these, we can calculate variance, standard deviation of the data.
+
+```{r include=TRUE}
+
+mean(chlorides)-2*sd(chlorides)
+mean(chlorides)+2*sd(chlorides)
+sum((chlorides>-0.006 & chlorides<0.181)==TRUE)/1599
+
+```
+
+The above formula tells us that range of the data is 97.1%.
+
+**Question 5d. How can you visualize the distribution of each variable?**
+
+We can visualize the distribution using histogram and boxplot.
+
+```{r include=TRUE}
+
+par(mfrow = c(1, 2))
+boxplot(chlorides, main = "BoxPlot", col="lightgreen")
+hist(chlorides, freq = FALSE, main = "Histogram", col="lightgreen")
+lines(density(chlorides), lwd=2, col='red')
+
+```
+
+**Question 5e. Do you see any skewed distributions?**
+
+Yes, the distribution is skewed to the right.
+
+
+6. ***Free Sulfurdioxide***
+
+**Question 5b. Any outliers? Do you have any concerns about the data quality?**
+
+First, we will get the summary of the column free.sulfur.dioxide.
+
+```{r include=TRUE}
+
+summary(free.sulfur.dioxide)
+
+```
+
+Looking at the summary it is observed that the range between min and 1st quartlie and the range betwwen 3rd quartile and max is notably greater, which indicates there is a lot of variation in the data and there are outliers in the data.
+
+```{r include=TRUE}
+
+sum(is.na(free.sulfur.dioxide))
+
+```
+
+**Concerning the data quality issues** - There are no missing values in the column and the statistics show that there are outliers in the data which indicates data quality concern.
+
+**Question 5c. How can you summarize the data of each variable in a concise way? What statistics are you going to present?**
+
+```{r include=TRUE}
+
+var(free.sulfur.dioxide)
+sd(free.sulfur.dioxide)
+
+```
+
+The summary function is able to summarize the data in a concise way. It gives us the Min., 1st Qu., Median, Mean, 3rd Qu. and Max values. Apart from these, we can calculate variance, standard deviation of the data.
+
+```{r include=TRUE}
+
+mean(free.sulfur.dioxide)-2*sd(free.sulfur.dioxide)
+mean(free.sulfur.dioxide)+2*sd(free.sulfur.dioxide)
+sum((free.sulfur.dioxide>-5.04 & free.sulfur.dioxide<36.79)==TRUE)/1599
+
+```
+
+The above formula tells us that range of the data is 95.87% ~ 95%.
+
+**Question 5d. How can you visualize the distribution of each variable?**
+
+We can visualize the distribution using histogram and boxplot.
+
+```{r include=TRUE}
+
+par(mfrow = c(1, 2))
+boxplot(free.sulfur.dioxide, main = "BoxPlot", col="lightgreen")
+hist(free.sulfur.dioxide, freq = FALSE, main = "Histogram", col="lightgreen")
+lines(density(free.sulfur.dioxide), lwd=2, col='red')
+
+```
+
+**Question 5e. Do you see any skewed distributions?**
+
+Yes, the distribution is skewed to the right.
+
+7. ***Total Sulfurdioxide***
+
+**Question 5b. Any outliers? Do you have any concerns about the data quality?**
+
+First, we will get the summary of the column total.sulfur.dioxide.
+
+```{r include=TRUE}
+
+summary(total.sulfur.dioxide)
+
+```
+
+Looking at the summary it is observed that the range between min and 1st quartile and the range between 3rd quartile and max is notably greater, also there is a notable difference between mean and median - there is a lot of variation in the data which indicates that there are outliers in the data.
+
+```{r include=TRUE}
+
+sum(is.na(total.sulfur.dioxide))
+
+```
+
+**Concerning the data quality issues** - There are no missing values in the column and the statistics shows that the mean and median have a notable difference. There are outliers in this column, which indicates data quality concerns.
+
+**Question 5c. How can you summarize the data of each variable in a concise way? What statistics are you going to present?**
+
+```{r include=TRUE}
+
+var(total.sulfur.dioxide)
+sd(total.sulfur.dioxide)
+
+```
+
+The summary function is able to summarize the data in a concise way. It gives us the Min., 1st Qu., Median, Mean, 3rd Qu. and Max values. Apart from these, we can calculate variance, standard deviation of the data.
+
+```{r include=TRUE}
+
+mean(total.sulfur.dioxide)-2*sd(total.sulfur.dioxide)
+mean(total.sulfur.dioxide)+2*sd(total.sulfur.dioxide)
+sum((total.sulfur.dioxide>-19.32 & total.sulfur.dioxide<112.25)==TRUE)/1599
+
+```
+
+The above formula tells us that range of the data is 94.99% ~ 95%.
+
+**Question 5d. How can you visualize the distribution of each variable?**
+
+We can visualize the distribution using histogram and boxplot.
+
+```{r include=TRUE}
+
+par(mfrow = c(1, 2))
+boxplot(total.sulfur.dioxide, main = "BoxPlot", col="lightgreen")
+hist(total.sulfur.dioxide, freq = FALSE, main = "Histogram", col="lightgreen")
+lines(density(total.sulfur.dioxide), lwd=2, col='red')
+
+```
+
+**Question 5e. Do you see any skewed distributions?**
+
+Yes, the distribution is skewed to the right.
+
+8. ***Density***
+
+**Question 5b. Any outliers? Do you have any concerns about the data quality?**
+
+First, we will get the summary of the column density.
+
+```{r include=TRUE}
+
+summary(density)
+
+```
+
+Looking at the summary it is unlikely that the data has any outliers as the mean and median are also same and the max and min values are close to the quartiles.
+
+```{r include=TRUE}
+
+sum(is.na(density))
+
+```
+
+**Concerning the data quality issues** - There are no missing values in the column and the statistics shows that the mean and median same which indicates that there is no skewness. Hence the data doesn't seem to have any concerning quality issues.
+
+**Question 5c. How can you summarize the data of each variable in a concise way? What statistics are you going to present?**
+
+```{r include=TRUE}
+
+var(density)
+sd(density)
+
+```
+
+The summary function is able to summarize the data in a concise way. It gives us the Min., 1st Qu., Median, Mean, 3rd Qu. and Max values. Apart from these, we can calculate variance, standard deviation of the data.
+
+```{r include=TRUE}
+mean(density)-2*sd(density)
+mean(density)+2*sd(density)
+sum((density>0.99 & density<1)==TRUE)/1599
+```
+
+The above formula tells us that range of the data is 94.93% ~ 95%.
+
+**Question 5d. How can you visualize the distribution of each variable?**
+
+We can visualize the distribution using histogram and boxplot.
+
+```{r include=TRUE}
+
+par(mfrow = c(1, 2))
+boxplot(density, main = "BoxPlot", col="lightgreen")
+hist(density, freq = FALSE, main = "Histogram", col="lightgreen")
+lines(density(density), lwd=2, col='red')
+
+```
+
+**Question 5e. Do you see any skewed distributions?**
+
+No, there is no skewed distribution.
+
+9. ***pH***
+
+**Question 5b. Any outliers? Do you have any concerns about the data quality?**
+
+First, we will get the summary of the column pH.
+
+```{r include=TRUE}
+
+summary(pH)
+
+```
+
+Looking at the summary it is observed that the range between min and 1st quartile and the range between 3rd quartile and max is notably greater, which indicates that there are a few outliers in the data.
+
+```{r include=TRUE}
+
+sum(is.na(pH))
+
+```
+
+Concerning the data quality issues - There are no missing values in the column and the statistics shows that the mean and median are almost same which indicates that the skewness is minimum. The distribution is approximately symmetric. Hence, the data doesn't seem to have any concerning quality issues.
+
+**Question 5c. How can you summarize the data of each variable in a concise way? What statistics are you going to present?**
+
+```{r include=TRUE}
+
+var(pH)
+sd(pH)
+
+```
+
+The summary function is able to summarize the data in a concise way. It gives us the Min., 1st Qu., Median, Mean, 3rd Qu. and Max values. Apart from these, we can calculate variance, standard deviation of the data.
+
+```{r include=TRUE}
+
+mean(pH)-2*sd(pH)
+mean(pH)+2*sd(pH)
+sum((pH>3.00 & pH<3.61)==TRUE)/1599
+
+```
+
+The above formula tells us that range of the data is 94.80% ~ 95%.
+
+**Question 5d. How can you visualize the distribution of each variable?**
+
+We can visualize the distribution using histogram and boxplot.
+
+```{r include=TRUE}
+
+par(mfrow = c(1, 2))
+boxplot(pH, main = "BoxPlot", col="lightgreen")
+hist(pH, freq = FALSE, main = "Histogram", col="lightgreen")
+lines(density(pH), lwd=2, col='red')
+
+```
+
+**Question 5e. Do you see any skewed distributions?**
+
+Yes, the distribution is slightly skewed to the right.
+
+10. ***Sulphates***
+
+**Question 5b. Any outliers? Do you have any concerns about the data quality?**
+
+First, we will get the summary of the column sulphates.
+
+```{r include=TRUE}
+
+summary(sulphates)
+
+```
+
+Looking at the summary it is observed that the range between 3rd quartile and max is notably greater, which indicates that 75% of the data is till 0.73 and rest 25% is till 2.00 - there is a lot of variation in the data which indicates that there are outliers in the data.
+
+```{r include=TRUE}
+
+sum(is.na(sulphates))
+
+```
+
+**Concerning the data quality issues** - There are no missing values in the column and the statistics shows that the range between 3rd quartile and max is greater, which tells us that there are outliers in the data which can be a data quality concern.
+
+**Question 5c. How can you summarize the data of each variable in a concise way? What statistics are you going to present?**
+
+```{r include=TRUE}
+
+var(sulphates)
+sd(sulphates)
+
+```
+
+The summary function is able to summarize the data in a concise way. It gives us the Min., 1st Qu., Median, Mean, 3rd Qu. and Max values. Apart from these, we can calculate variance, standard deviation of the data.
+
+```{r include=TRUE}
+
+mean(sulphates)-2*sd(sulphates)
+mean(sulphates)+2*sd(sulphates)
+sum((sulphates>0.31 & sulphates<0.99)==TRUE)/1599
+
+```
+
+The above formula tells us that range of the data is 96.12%.
+
+**Question 5d. How can you visualize the distribution of each variable?**
+
+We can visualize the distribution using histogram and boxplot.
+
+```{r include=TRUE}
+
+par(mfrow = c(1, 2))
+boxplot(sulphates, main = "BoxPlot", col="lightgreen")
+hist(sulphates, freq = FALSE, main = "Histogram", col="lightgreen")
+lines(density(sulphates), lwd=2, col='red')
+
+```
+
+**Question 5e. Do you see any skewed distributions?**
+
+Yes, the distribution is skewed to the right.
+
+11. ***Alcohol***
+
+**Question 5b. Any outliers? Do you have any concerns about the data quality?**
+
+First, we will get the summary of the column alcohol.
+
+```{r include=TRUE}
+
+summary(alcohol)
+
+```
+
+Looking at the summary it is observed that the range between 3rd quartile and max is notably greater, which indicates that 75% of the data is till 11.10 and rest 25% is till 14.90 - there is a lot of variation in the data which indicates that there might be outliers in the data.
+
+```{r include=TRUE}
+
+sum(is.na(alcohol))
+
+```
+
+**Concerning the data quality issues** - There are no missing values in the column and the statistics shows that the mean and median are almost same which indicates that the skewness is minimum. Hence the data doesn't seem to have any concerning quality issues.
+
+**Question 5c. How can you summarize the data of each variable in a concise way? What statistics are you going to present?**
+
+```{r include=TRUE}
+
+var(alcohol)
+sd(alcohol)
+
+```
+
+The summary function is able to summarize the data in a concise way. It gives us the Min., 1st Qu., Median, Mean, 3rd Qu. and Max values. Apart from these, we can calculate variance, standard deviation of the data.
+
+```{r include=TRUE}
+
+mean(alcohol)-2*sd(alcohol)
+mean(alcohol)+2*sd(alcohol)
+sum((alcohol>8.29 & alcohol<12.55)==TRUE)/1599
+
+```
+
+The above formula tells us that range of the data is 95.62% ~ 95%.
+
+**Question 5d. How can you visualize the distribution of each variable?**
+
+We can visualize the distribution using histogram and boxplot.
+
+```{r include=TRUE}
+
+par(mfrow = c(1, 2))
+boxplot(alcohol, main = "BoxPlot", col="lightgreen")
+hist(alcohol, freq = FALSE, main = "Histogram", col="lightgreen")
+lines(density(alcohol), lwd=2, col='red')
+
+```
+
+**Question 5e. Do you see any skewed distributions?**
+
+Yes, the distribution is skewed to the right.
+
+12. ***Quality***
+
+```{r include=TRUE}
+summary(quality)
+```
+
+Quality is the target variable which means the quality depends upon all the other physicochemical variables.We can summarise the data using summary function which will give us the basic statistics - min, max, mean, median. 
+
+We can visualize the distribution to find mode using histogram.
+
+```{r include=TRUE}
+
+hist(quality, freq = FALSE, main = "Histogram", col="lightgreen")
+lines(density(quality), lwd=2, col='red')
+
+```
+
+Looking at the histogram we can see that the mode is 5, maximum wines are of the quality "5".
+
+

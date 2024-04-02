@@ -1,0 +1,237 @@
+---
+title: "Wine Project - Part B (Assignment 3b)"
+author: "Aishwarya Jawalkar"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(here)
+library(stats4)
+
+```
+
+```{r}
+
+#Importing the necessary libraries
+library(tidyverse)
+library(here)
+library(stats4)
+
+```
+
+***Importing Dataset***
+
+```{r include=TRUE}
+
+#Reading the data set
+file_path_red <- here("Data", "winequality-red.csv")
+red_wine_data <- read.table(file_path_red, sep = ";", header = TRUE, stringsAsFactors = FALSE)
+view(red_wine_data)
+attach(red_wine_data)
+
+```
+
+**Question 1e. Can we use a normal distribution to model “density”? If yes, what are the maximum likelihood estimates of the mean and standard deviation? Please provide their standard errors as well.**
+
+***To check whether we can use normal distribution to model "density", we will plot the histogram of the variable***
+
+```{r include=TRUE}
+
+hist(density)
+
+```
+
+Yes, we can use normal distribution to model "density" which is evident from the histogram above.
+
+The MLE function for the variable "density" is not stable, as it is seen that the values are too small. To include these values, we will multiply the variable "density" by 10 to flatten the curve. Once everything is calculates we will transform them back.
+
+```{r include=TRUE}
+
+density_new <- density*10
+density_new
+
+```
+
+```{r include=TRUE}
+
+hist(density_new)
+
+```
+
+```{r include=TRUE}
+
+minuslog.lik<-function(mu, sigma){
+log.lik<-0
+for(i in 1:length(red_wine_data$density)){
+log.lik = log.lik + log(dnorm(x=density_new[i], mean = mu, sd = sigma))
+}
+return(-log.lik)
+}
+
+minuslog.lik(80, 20)
+
+```
+
+```{r include=TRUE}
+
+minuslog.lik(100, 30)
+
+```
+
+```{r include=TRUE}
+
+minuslog.lik(0, 1)
+
+```
+
+```{r include=TRUE}
+#Maximum likelihood estimation
+
+est <- mle(minuslog = minuslog.lik, start = list(mu = mean(density_new),
+                                sigma = sd(density_new)))
+
+summary(est)
+
+```
+
+**Maximum Likelihood Estimation for "density"**
+
+The MLE of the mean is 9.9674(rounded off). But to ensure the accuracy we need to divide it by 10.
+Therefore, the MLE of mean is **0.9967**
+
+The MLE of the standard deviation is 0.0188(rounded off). But to ensure the accuracy we need to divide it by 10.
+Therefore, the MLE of standard deviation is **0.0018**
+
+**Standard Error for "density"**
+
+The standard error of mean is **0.0004**(rounded off). But to ensure the accuracy we need to divide it by 10.
+Therefore, the standard error of mean is **0.00004**
+
+The standard error of standard deviation is **0.0003**(rounded off). But to ensure the accuracy we need to divide it by 10.
+Therefore, the standard error of standard deviation is **0.00003**
+
+**Question 2d. Can we use a normal distribution to model “residual sugar”? If no, what distribution do you think can approximate its empirical distribution? What parameters are needed to characterize such a distribution? what are their maximum likelihood estimates? Please provide their standard errors as well.**
+
+***To check whether we can use normal distribution to model "residual.sugar", we will plot the histogram of the variable***
+
+```{r include=TRUE}
+
+hist(residual.sugar)
+
+```
+
+From the histogram it is evident that we can't use normal distribution to model "residual.sugar". The distribution of "residual.sugar" is highly skewed to the right, which suggests that Log-normal distribution can be used to approximate its empirical distribution. The Log-normal distribution can be described as, “Density, Distribution function, Quantile function and Random generation for the Log-normal distribution whose logarithm has mean equal to meanlog and standard deviation equal to sdlog.”
+
+Log-normal distribution comes with parameters μ and σ, they are the expected value (or mean) and standard deviation of the variable's natural logarithm. dlnorm gives the density of the function.
+
+```{r include=TRUE}
+
+minuslog.lik <- function(mu, sigma) {
+  log.lik <- 0
+  for(i in 1:length(red_wine_data$residual.sugar)) {
+    log.lik = log.lik + log(dlnorm(x=`residual.sugar`[i], meanlog=mu, sdlog=sigma))
+  }
+  return(-log.lik)
+}
+
+minuslog.lik(80, 20)
+
+```
+
+
+```{r include=TRUE}
+
+minuslog.lik(100, 30)
+
+```
+
+
+```{r include=TRUE}
+
+minuslog.lik(0, 1)
+
+```
+
+
+```{r include=TRUE}
+
+est_sugar_r <- mle(minuslog=minuslog.lik,
+                 start = list(mu=log(mean(`residual.sugar`)), sigma=log(sd(`residual.sugar`))))
+
+summary(est_sugar_r)
+
+```
+
+**Maximum Likelihood Estimation for "residual.sugar"**
+
+The MLE of the mean is **0.8502**(rounded off), and of standard deviation is **0.3573**(rounded off).
+
+**Standard Error for "residual.sugar"**
+
+The standard error of mean is **0.0089**(rounded off), an of standard deviation is **0.0063**(rounded off). 
+
+```{r include=TRUE}
+
+# Check the similarity
+#Simulate 1599 observations from the fitted lognormal distribution using the MLEs as the parameter values
+
+sugar_simulate <- rlnorm(1599, meanlog = 0.8502, sdlog = 0.3573)
+
+par(mfrow = c(1, 2))
+hist(sugar_simulate, breaks = seq(from = 0, to = 20, by = 1))
+hist(`residual.sugar`, breaks = seq(from = 0, to = 20, by = 1))
+
+
+```
+
+**Question 3d. What is the maximum likelihood estimate of p and its standard error?**
+
+```{r include=TRUE}
+
+excellent_wine <- red_wine_data %>%
+  mutate(excellent = as.numeric(quality >=7))
+
+attach(excellent_wine)
+head(excellent)
+
+```
+
+***To check whether we can use normal distribution to model "excellent", we will plot the histogram of the variable***
+
+```{r include=TRUE}
+
+hist(excellent)
+
+```
+
+From the histogram it is evident that we can't use normal distribution to model "excellent". The values are binary i.e either 1 or 0. So we can use Bernoulli Distribution to model the variable "excellent".
+
+```{r include=TRUE}
+
+minuslog.lik <- function(p) {
+  log.lik <- 0
+  for(i in 1:length(excellent_wine$excellent)) {
+    log.lik <- log.lik + log(dbinom(excellent[i], size = 1, prob = p))
+  }
+  return(-log.lik)
+}
+
+```
+
+```{r include=TRUE}
+
+est_excellent <- mle(minuslog = minuslog.lik,
+                   start = list(p = mean(excellent)))
+
+summary(est_excellent)
+
+```
+
+The MLE for the proportion of p is **0.1357**(rounded off), and the standard error for the proportion of p is **0.0085**
+

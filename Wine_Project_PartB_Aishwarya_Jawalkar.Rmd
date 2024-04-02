@@ -1,0 +1,237 @@
+---
+title: "Wine Project - Part B"
+author: "Aishwarya Jawalkar"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+```
+
+```{r}
+#Importing the necessary libraries
+library(tidyverse)
+library(here)
+
+```
+
+***Importing Dataset***
+
+```{r include=TRUE}
+
+#Reading the data set
+file_path_red <- here("Data", "winequality-red.csv")
+red_wine_data <- read.table(file_path_red, sep = ";", header = TRUE, stringsAsFactors = FALSE)
+view(red_wine_data)
+attach(red_wine_data)
+
+```
+
+**Suppose the population mean of the variable “density” is μ , do the following inferences**
+
+**Question 1a. Provide an estimate of μ based on the sample **
+
+```{r include=TRUE}
+
+mean_density <- mean(density)
+mean_density
+
+```
+
+Estimate of μ based on the sample is 0.9967467
+
+**Question 1b. Use the Central Limit Theorem (CLT) to quantify the variability of your estimate **
+
+```{r include=TRUE}
+
+mu_hat_density <- sd(density)/sqrt(length(density))
+mu_hat_density
+
+```
+
+Using the CLT, the variability of the estimate is 4.71981e-05.
+
+**Question 1c. Use the CLT to give a 95% confidence interval for μ. **
+
+```{r include=TRUE}
+
+clt_interval <- c(mean_density - 2*mu_hat_density,mean_density + 2*mu_hat_density)
+clt_interval
+
+```
+So, using the CLT, the confidence interval for mean μ is between 0.9966523 and 0.9968411
+
+**Question 1d. Use the bootstrap method to do parts b and c, and compare the results with those obtained from the CLT. State your findings.**
+
+```{r include=TRUE}
+mu.hat.set <- NULL
+for(k in 1:2000){
+  sample.bootstrap <- sample(density, size = 1599, replace = T)
+  mu.hat <- mean(sample.bootstrap)
+  mu.hat.set[k] <- mu.hat
+}
+
+sd(mu.hat.set)
+
+```
+Using the bootstrap method, variability of the estimate is 6.667331e-05.
+
+**Finding the 95% confidence interval using bootstrap method :**
+
+```{r include=TRUE}
+
+bt_interval <- quantile(mu.hat.set, probs=c(0.025,0.975))
+bt_interval
+
+```
+The 95% confidence interval using bootstrap method is between 0.9966185 and 0.9968758
+
+```{r include=TRUE}
+
+hist(mu.hat.set, freq = FALSE, col = "pink")
+lines(density(mu.hat.set), lwd = 5, col = "red")
+
+```
+
+The 95% confidence interval using the CLT method is `r clt_interval` and using the Bootstrap method is `r bt_interval`. Looking at both the intervals, we can say that they are quite similar to each other with a very minor difference.
+
+**Suppose the population mean of the variable “residual sugar” is μ , answer the following questions.**
+
+**Question 2a. Provide an estimate of μ based on the sample **
+
+```{r include=TRUE}
+
+mean_residual_sugar <- mean(residual.sugar)
+mean_residual_sugar
+
+```
+Estimate of μ based on the sample is 2.538806
+
+**Question 2b. Noting that the sample distribution of “residual sugar” is highly skewed, can we use the CLT to quantify the variability of your estimate? Can we use the CLT to give a 95% confidence interval for μ? If yes, please give your solution. If no, explain why.**
+
+```{r include=TRUE}
+
+hist(residual.sugar)
+
+```
+
+Yes, we can use the CLT to quantify the variability of the estimate and also we can use CLT to give a 95% confidence interval for μ. Regardless of the type or skewness of the data, which is visible in the histogram, the sample mean approximately follows the same distribution, which is normal.
+
+```{r include=TRUE}
+
+mu_hat_residual_sugar <- sd(residual.sugar)/sqrt(length(residual.sugar))
+mu_hat_residual_sugar
+
+```
+
+The variability of the estimate using CLT is `r mu_hat_residual_sugar`
+
+```{r include=TRUE}
+
+c(mean_residual_sugar - 2*mu_hat_residual_sugar,mean_residual_sugar + 2*mu_hat_residual_sugar)
+
+```
+So, using the CLT, the confidence interval for mean μ is between 2.468287 and 2.609324
+
+**Question 2c. Use the bootstrap method to do part b. Is the bootstrap confidence interval symmetric? **
+
+```{r include=TRUE}
+
+mu.hat.set <- NULL
+for(k in 1:2000){
+  sample.bootstrap <- sample(residual.sugar, size = 1599, replace = T)
+  mu.hat <- mean(sample.bootstrap)
+  mu.hat.set[k] <- mu.hat
+}
+
+sd(mu.hat.set)
+
+```
+Using the bootstrap method the mu hat is 0.03445134.
+
+The 95% confidence interval using bootstrap method:
+
+```{r include=TRUE}
+
+quantile(mu.hat.set, probs=c(0.025,0.975))
+
+```
+
+Using the Boostrap method the 95% confidence interval is between 2.471880 and 2.606671.
+
+```{r include=TRUE}
+
+hist(mu.hat.set, freq = FALSE, col = "pink")
+lines(density(mu.hat.set), lwd = 5, col = "red")
+
+```
+
+Looking at the histogram we can infer that the bootstrap confidence interval is symmetric.
+
+**Question 3. We classify those wines as “excellent” if their rating is at least 7.**
+
+```{r include=TRUE}
+
+excellent_wine <- red_wine_data %>%
+  mutate(excellent = as.numeric(quality >=7))
+
+attach(excellent_wine)
+head(excellent)
+
+```
+
+Let's consider the population of excellent is 'p'
+
+**Question 3a. Use the CLT to derive a 95% confidence interval for p**
+
+```{r include=TRUE}
+
+mean_excellent = mean(excellent)
+mean_excellent
+
+mu_hat_excellent = sd(excellent)/sqrt(length(excellent))
+mu_hat_excellent
+
+ctl_confidence <- c(mean_excellent - 2*mu_hat_excellent, mean_excellent + 2*mu_hat_excellent)
+ctl_confidence
+```
+The 95% confidence interval using the CLT is `r ctl_confidence`
+So, we can say that the excellent quality wine lies between 11.85% and 15.28%
+
+**Question 3b. Use the bootstrap method to derive a 95% confidence interval for p **
+
+```{r include=TRUE}
+
+mu.hat.set <- NULL
+for(k in 1:2000){
+  sample.bootstrap <- sample(excellent, size = 1599, replace = T)
+  mu.hat <- mean(sample.bootstrap)
+  mu.hat.set[k] <- mu.hat
+}
+
+sd(mu.hat.set)
+
+boot_interval <- quantile(mu.hat.set, probs=c(0.025,0.975))
+boot_interval
+
+```
+Using the bootstrap method the 95% confidence interval is `r boot_interval`
+So, we can say that the excellent quality wine lies between 11.94% and 14.25%
+
+```{r include=TRUE}
+hist(mu.hat.set, freq = FALSE, col = "pink")
+lines(density(mu.hat.set), lwd = 5, col = "red")
+```
+
+**Question 3c. Compare the two intervals. Is there any difference worth our attention? **
+The confidence interval using CLT is `r ctl_confidence` and using Bootstrap method is `r boot_interval`. Both the intervals are quite similar with a very minor difference of 0.001270.
+
+  
+So, we can say that :
+1. Using the CLT method excellent quality wine can be between 11.85% to 15.28%
+2. Using the Bootstrap method excellent wine can be between 11.94% to 15.25%
